@@ -1,0 +1,63 @@
+{
+  "variables": {
+    "vsphere-server": "vcsa.local.lan",
+    "vsphere-user": "administrator@vsphere.local",
+    "vsphere-password": "password_here",
+    
+    "vsphere-datacenter": "Datacenter",
+    "vsphere-host": "esxinuc.local.lan",
+    "vsphere-network": "LAB",
+    "vsphere-datastore": "nuc_local",
+    
+    "vm-name": "CentOS8-Template",
+    "vm-cpu-num": "1",
+    "vm-mem-size": "1024",
+    "vm-disk-size": "25600",
+    
+    "iso_url": "[nuc_local] isos/CentOS-8.1.1911-x86_64-dvd1.iso"
+  },
+
+  "builders": [
+    {
+      "type": "vsphere-iso",
+  
+      "vcenter_server": "{{user `vsphere-server`}}",
+      "username": "{{user `vsphere-user`}}",
+      "password": "{{user `vsphere-password`}}",
+      "insecure_connection": "true",
+
+      "datacenter": "{{user `vsphere-datacenter`}}",
+      "host": "{{user `vsphere-host`}}",
+      "network": "{{user `vsphere-network`}}",
+      "datastore": "{{user `vsphere-datastore`}}",
+
+      "vm_name": "{{user `vm-name`}}",
+      "notes": "Built with Packer",
+      "guest_os_type": "centos8_64Guest",
+
+      "boot_wait": "10s",
+      "boot_order": "disk,cdrom",
+      "http_directory": "http",
+
+      "ssh_username": "root",
+      "ssh_password": "Pass.123",
+
+      "CPUs": "{{user `vm-cpu-num`}}",
+      "RAM": "{{user `vm-mem-size`}}",
+      "RAM_reserve_all": false,
+      "disk_controller_type": "pvscsi",
+      "disk_size": "{{user `vm-disk-size`}}",
+      "disk_thin_provisioned": true,
+      "network_card": "vmxnet3",
+
+      "convert_to_template": true,
+
+      "iso_paths": ["{{user `iso_url`}}"],
+      "boot_command": [
+        "<esc><wait>",
+        "linux inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg",
+        "<enter>"
+      ]
+    }
+  ]
+}
